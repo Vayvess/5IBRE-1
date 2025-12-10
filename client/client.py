@@ -1,58 +1,49 @@
-import time
-import socket
-import threading
-import selectors
 import tkinter as tk
-from queue import Queue, Empty
 
+from shared.constants import *
+from client.networker import Networker
 
-class Networker(threading.Thread):
-    def __init__(self, msgq):
-        super().__init__(daemon=True)
-
-        self.running = True
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        
-        self.msgq = msgq
-        self.rbuff = bytearray()
-        self.sbuff = bytearray()
-        self.selector = selectors.DefaultSelector()
-        
-    
-    def connect(self, host, port, username):
-        self.sock.connect((host, port))
-        self.selector.register(self.sock, selectors.EVENT_READ, None)
-
-        self.username = username
-
-    def handle_tcpread(self):
-        pass
-
-    def handle_tcpwrite(self):
-        pass
-    
-    def run(self):
-        while self.running:
-            events = self.selector.select()
-            for key, mask in events:
-                if mask & selectors.EVENT_READ:
-                    self.handle_tcpread()
-                if mask & selectors.EVENT_WRITE:
-                    self.handle_tcpwrite()
-    
-    def stop(self):
-        self.running = False
 
 class Client:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("My Tkinter App")
+        self.root.geometry("800x600")
 
-        self.msg_queue = Queue()
-        self.networker = Networker(self.msg_queue)
+        # NETWORKING
+        self.connected = False
+        self.networker = None
+        
+        # Create the button
+        self.button = tk.Button(self.root, text="connect", command=self.connect)
+        self.button.pack(pady=20)
+
+        self.button = tk.Button(self.root, text="test send", command=self.test_send)
+        self.button.pack(pady=20)
     
+    def connect(self):
+        if self.connected:
+            return
+        
+        self.networker = Networker()
+        connected = self.networker.connect('localhost', 3000)
+        if connected:
+            self.connected = True
+            self.networker.start()
+        
+        print(connected)
+    
+    def test_send(self):
+        msg = {
+            MsgField.TYPE : MsgType.LOGIN,
+            MsgField.USERN: "Anto25",
+            MsgField.PASSW: "admin123"
+        }
+        
+        self.networker.send(msg)
+
     def on_close(self):
-        pass
+        self.root.destroy()
     
     def run(self):
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
