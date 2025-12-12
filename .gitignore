@@ -2,3 +2,8 @@ venv
 shared/__pycache__
 server/__pycache__
 client/__pycache__
+ideas.txt
+trash/assets
+trash/__pycache__
+trash/scenes/__pycache__
+client/screens/__pycache__

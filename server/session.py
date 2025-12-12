@@ -1,6 +1,8 @@
 import json
 
 class Session:
+    SESSID = 1
+
     def __init__(self, sock):
         self.sock = sock
         self.alive = True
@@ -10,16 +12,17 @@ class Session:
         self.sbuff = bytearray()
         
         # SESSION DATA
-        self.usern = 'anon'
+        self.usern = f'anon{Session.SESSID}'
+        Session.SESSID += 1
     
-    def buffer_msg(self, msg):
+    def buffer_tcpmsg(self, msg):
         encoded = json.dumps(msg).encode()
         blen = len(encoded).to_bytes(2, 'big')
 
         self.sbuff.extend(blen)
         self.sbuff.extend(encoded)
     
-    def extract(self, data):
+    def extract_tcpmsg(self, data):
         messages = []
         self.rbuff.extend(data)
         view = memoryview(self.rbuff)

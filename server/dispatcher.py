@@ -1,20 +1,21 @@
-from shared.constants import MsgType, MsgField
+from shared.constants import TcpMsg
 
 # REQUEST HANDLERS
-def handle_login(server, sess, msg):
-    sess.usern = msg.get(MsgField.PASSW)
-    server.send_msg(sess, msg)
-    print(msg)
+def room_join(server, sess, msg):
+    server.send_tcpmsg(sess, {
+        TcpMsg.TYPE: TcpMsg.ROOM_JOINED,
+        TcpMsg.STATUS: True
+    })
 
 class Dispatcher:
     def __init__(self, server):
         self.server = server
         self.handlers = {
-            MsgType.LOGIN: handle_login
+            TcpMsg.ROOM_JOIN: room_join
         }
     
     def dispatch(self, sess, msg):
-        msgtype = msg.get(MsgField.TYPE)
+        msgtype = msg.get(TcpMsg.TYPE)
         if msgtype is None:
             return
         

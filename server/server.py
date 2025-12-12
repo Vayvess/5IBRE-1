@@ -21,9 +21,8 @@ class Server:
     def handle_accept(self):
         try:
             sock, addr = self.tcp_sock.accept()
-            print("anon connected to the server")
         except socket.error as err:
-            print("here wtf", err)
+            print("accept: ", err)
         else:
             sock.setblocking(False)
             sess = Session(sock)
@@ -36,7 +35,7 @@ class Server:
             self.selector.unregister(sess.sock)
             sess.sock.close()
     
-    def send_msg(self, sess, msg):
+    def send_tcpmsg(self, sess, msg):
         if not sess.alive:
             return
         
@@ -44,13 +43,13 @@ class Server:
             RW_EVENT = selectors.EVENT_READ | selectors.EVENT_WRITE
             self.selector.modify(sess.sock, RW_EVENT, sess)
         
-        sess.buffer_msg(msg)
+        sess.buffer_tcpmsg(msg)
     
     def process_data(self, sess, data):
         if not sess.alive:
             return
         
-        for msg in sess.extract(data):
+        for msg in sess.extract_tcpmsg(data):
             if msg != -1:
                 self.dispatcher.dispatch(sess, msg)
             else:

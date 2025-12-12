@@ -24,6 +24,7 @@ class Networker(threading.Thread):
         try:
             self.sock.connect((host, port))
         except Exception as err:
+            print("connect: ", err)
             return False
 
         self.sock.setblocking(False)
