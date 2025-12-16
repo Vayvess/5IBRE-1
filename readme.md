@@ -26,7 +26,7 @@ source venv/bin/activate
 
 - On Windows PowerShell
 ```bash
-source venv/bin/activate
+venv\Scripts\activate
 ```
 
 ### 3. Install Dependencies
