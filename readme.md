@@ -26,7 +26,7 @@ source venv/bin/activate
 
 - On Windows PowerShell
 ```bash
-source venv/bin/activate
+venv\Scripts\activate
 ```
 
 ### 3. Install Dependencies
@@ -49,6 +49,7 @@ python3 -m server.server --debug
 python3 -m server.server --addr 0.0.0.0 --port 6667 --debug
 
 # CTRL+C to stop the server
+```
 
 ### 5. Start any client
 ```bash
